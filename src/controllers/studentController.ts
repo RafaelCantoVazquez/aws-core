@@ -53,7 +53,7 @@ export const updateStudent = (req: Request, res: Response) => {
     if (s.id == req.params.id) {
       s = student;
     }
-    return student;
+    return s;
   });
 
   return res.status(200).json(students);
