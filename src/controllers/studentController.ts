@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { Student, StudentSchema } from '../models/studentModel';
+import { Student } from '../models/';
+import { StudentSchema } from '../models/studentModel';
 import { StudentValidator } from '../utils/joi';
 
 export const getStudents = async (req: Request, res: Response) => {

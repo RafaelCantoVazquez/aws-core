@@ -1,26 +1,26 @@
-import Sequelize from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/db';
 
-export const Teacher = sequelize.define('Teacher', {
+const Teacher = sequelize.define('Teacher', {
   id: {
-    type: Sequelize.INTEGER,
+    type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   },
   nombres: {
-    type: Sequelize.STRING,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   apellidos: {
-    type: Sequelize.STRING,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   numeroEmpleado: {
-    type: Sequelize.INTEGER,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   horasClase: {
-    type: Sequelize.INTEGER,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
 });
@@ -31,3 +31,5 @@ export interface TeacherSchema {
   numeroEmpleado: number;
   horasClase: number;
 }
+
+export default Teacher;

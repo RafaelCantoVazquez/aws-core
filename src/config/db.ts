@@ -1,7 +1,6 @@
 import { Sequelize } from 'sequelize';
 import { DB_NAME, USERNAME, PASSWORD, HOSTNAME, PORT } from './config';
-import { Student } from './../models/studentModel';
-import { Teacher } from './../models/teacherModel';
+import { Student, Teacher } from '../models';
 
 export const sequelize = new Sequelize(DB_NAME, USERNAME, PASSWORD, {
   host: HOSTNAME,
@@ -12,7 +11,7 @@ export const sequelize = new Sequelize(DB_NAME, USERNAME, PASSWORD, {
   // },
 });
 
-export const testConnection = () => {
+export const connectDB = () => {
   try {
     sequelize.authenticate();
     Student.sync({ force: true });

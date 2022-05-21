@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { Teacher, TeacherSchema } from '../models/teacherModel';
+import { Teacher } from '../models';
+import { TeacherSchema } from '../models/teacherModel';
 import { TeacherValidator } from '../utils/joi';
 
 export const getTeachers = async (req: Request, res: Response) => {
