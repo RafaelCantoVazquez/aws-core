@@ -1,17 +1,59 @@
 import { Request, Response } from 'express';
 import { Teacher, TeacherSchema } from '../models/teacherModel';
+import { TeacherValidator } from '../utils/joi';
 
-var teachers: Teacher[] = [];
+export const getTeachers = async (req: Request, res: Response) => {
+  const teachers = await Teacher.findAll();
 
-export const getTeachers = (req: Request, res: Response) => {
-  if (teachers.length === 0) {
-    return res.status(404).json({ message: 'There is no teachers' });
-  }
-  return res.status(200).json(teachers);
+  return teachers
+    ? res.status(200).json(teachers)
+    : res.status(404).json({ message: 'There is no teachers' });
 };
 
-export const getTeacherById = (req: Request, res: Response) => {
-  const teacher = teachers.find((t) => t.id == req.params.id);
+export const getTeacherById = async (req: Request, res: Response) => {
+  const teacher = await Teacher.findByPk(req.params.id);
+
+  return teacher
+    ? res.status(200).json(teacher)
+    : res
+        .status(404)
+        .json({ message: 'There is no teacher with id ' + req.params.id });
+};
+
+export const createTeacher = async (req: Request, res: Response) => {
+  const teacherData: TeacherSchema = { ...req.body };
+
+  const { error, value } = TeacherValidator.validate(teacherData);
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid teacher data', error: error });
+  }
+
+  const teacher = await Teacher.create(value);
+
+  return res.status(201).json(teacher);
+};
+
+export const updateTeacher = async (req: Request, res: Response) => {
+  const teacherData: TeacherSchema = { ...req.body };
+
+  const { error, value } = TeacherValidator.validate(teacherData);
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid teacher data', error: error });
+  }
+
+  const teacher = await Teacher.update(value, { where: { id: req.params.id } });
+
+  return res.status(200).json(teacher);
+};
+
+export const deleteTeacher = async (req: Request, res: Response) => {
+  const teacher = await Teacher.destroy({ where: { id: req.params.id } });
 
   if (!teacher) {
     return res
@@ -20,60 +62,4 @@ export const getTeacherById = (req: Request, res: Response) => {
   }
 
   return res.status(200).json(teacher);
-};
-
-export const createTeacher = (req: Request, res: Response) => {
-  const teacher = { ...req.body };
-
-  const { error, value } = TeacherSchema.validate(teacher);
-
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid teacher data', error: error });
-  }
-
-  teachers.push(teacher);
-
-  return res.status(201).json(value);
-};
-
-export const updateTeacher = (req: Request, res: Response) => {
-  const teacher = { ...req.body };
-
-  const { error, value } = TeacherSchema.validate(teacher);
-
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid teacher data', error: error });
-  }
-
-  teachers = teachers.map((t) => {
-    if (t.id == req.params.id) {
-      t = teacher;
-    }
-    return t;
-  });
-
-  return res.status(200).json(teacher);
-};
-
-export const deleteTeacher = (req: Request, res: Response) => {
-  let isTeacherDeleted = false;
-  teachers = teachers.filter((teacher) => {
-    if (teacher.id != req.params.id) {
-      return teacher;
-    } else {
-      isTeacherDeleted = true;
-    }
-  });
-
-  if (!isTeacherDeleted) {
-    return res
-      .status(404)
-      .json({ message: 'There is no teacher with id ' + req.params.id });
-  }
-
-  return res.status(200).json(teachers);
 };

@@ -4,8 +4,10 @@ import dotenv from 'dotenv';
 import { errorHandler, notFound } from './middleware/errorMiddleware';
 import { studentsRoutes } from './routes/studentRoutes';
 import { teachersRoutes } from './routes/teacherRoutes';
+import { sequelize, testConnection } from './config/db';
 
 dotenv.config();
+testConnection();
 
 const app = express();
 const PORT = process.env.PORT || 8080;

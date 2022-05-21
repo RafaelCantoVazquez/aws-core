@@ -1,17 +1,33 @@
-import Joi from 'joi';
+import { DataTypes, Sequelize } from 'sequelize';
+import { sequelize } from '../config/db';
 
-export interface Student {
-  id: string;
+export const Student = sequelize.define('Student', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  nombres: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  apellidos: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  matricula: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  promedio: {
+    type: DataTypes.DOUBLE,
+    allowNull: false,
+  },
+});
+
+export interface StudentSchema {
   nombres: string;
   apellidos: string;
   matricula: string;
   promedio: number;
 }
-
-export const StudentSchema = Joi.object({
-  id: Joi.number().required(),
-  nombres: Joi.string().required(),
-  apellidos: Joi.string().required(),
-  matricula: Joi.string().required(),
-  promedio: Joi.number().required(),
-});

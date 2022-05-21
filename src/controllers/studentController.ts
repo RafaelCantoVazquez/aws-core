@@ -1,17 +1,59 @@
 import { Request, Response } from 'express';
 import { Student, StudentSchema } from '../models/studentModel';
+import { StudentValidator } from '../utils/joi';
 
-var students: Student[] = [];
+export const getStudents = async (req: Request, res: Response) => {
+  const students = await Student.findAll();
 
-export const getStudents = (req: Request, res: Response) => {
-  if (students.length === 0) {
-    return res.status(404).json({ message: 'There is no students' });
-  }
-  return res.status(200).json(students);
+  return students
+    ? res.status(200).json(students)
+    : res.status(404).json({ message: 'There is no students' });
 };
 
-export const getStudentById = (req: Request, res: Response) => {
-  const student = students.find((s) => s.id == req.params.id);
+export const getStudentById = async (req: Request, res: Response) => {
+  const student = await Student.findByPk(req.params.id);
+
+  return student
+    ? res.status(200).json(student)
+    : res
+        .status(404)
+        .json({ message: 'There is no student with id ' + req.params.id });
+};
+
+export const createStudent = async (req: Request, res: Response) => {
+  const studentData: StudentSchema = { ...req.body };
+
+  const { error, value } = StudentValidator.validate(studentData);
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid student data', error: error });
+  }
+
+  const student = await Student.create(value);
+
+  return res.status(201).json(student);
+};
+
+export const updateStudent = async (req: Request, res: Response) => {
+  const studentData: StudentSchema = { ...req.body };
+
+  const { error, value } = StudentValidator.validate(studentData);
+
+  if (error) {
+    return res
+      .status(400)
+      .json({ message: 'Invalid student data', error: error });
+  }
+
+  const student = await Student.update(value, { where: { id: req.params.id } });
+
+  return res.status(200).json(student);
+};
+
+export const deleteStudent = async (req: Request, res: Response) => {
+  const student = await Student.destroy({ where: { id: req.params.id } });
 
   if (!student) {
     return res
@@ -20,60 +62,4 @@ export const getStudentById = (req: Request, res: Response) => {
   }
 
   return res.status(200).json(student);
-};
-
-export const createStudent = (req: Request, res: Response) => {
-  const student = { ...req.body };
-
-  const { error, value } = StudentSchema.validate(student);
-
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid student data', error: error });
-  }
-
-  students.push(student);
-
-  return res.status(201).json(value);
-};
-
-export const updateStudent = (req: Request, res: Response) => {
-  const student = { ...req.body };
-
-  const { error, value } = StudentSchema.validate(student);
-
-  if (error) {
-    return res
-      .status(400)
-      .json({ message: 'Invalid student data', error: error });
-  }
-
-  students = students.map((s) => {
-    if (s.id == req.params.id) {
-      s = student;
-    }
-    return s;
-  });
-
-  return res.status(200).json(students);
-};
-
-export const deleteStudent = (req: Request, res: Response) => {
-  let isStudentDeleted = false;
-  students = students.filter((student) => {
-    if (student.id != req.params.id) {
-      return student;
-    } else {
-      isStudentDeleted = true;
-    }
-  });
-
-  if (!isStudentDeleted) {
-    return res
-      .status(404)
-      .json({ message: 'There is no student with id ' + req.params.id });
-  }
-
-  return res.status(200).json(students);
 };
