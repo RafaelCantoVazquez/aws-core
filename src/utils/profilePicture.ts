@@ -16,12 +16,11 @@ const s3 = new aws.S3({
 export const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: process.env.AWS_BUCKET, // Your bucket name goes here
+    bucket: process.env.AWS_BUCKET,
     metadata: function (req, file, cb) {
       cb(null, { fieldName: file.fieldname });
-      // The metadata you want to send.
     },
-    acl: 'public-read', // Optional ACL
+    acl: 'public-read',
     key: async function (req: Request, file, cb) {
       const student = await Student.findByPk(req.params.id);
 
@@ -30,7 +29,6 @@ export const upload = multer({
 
       cb(null, `fotos/${req.params.id}_fotoPerfil_${file.originalname}`);
     },
-    contentType: multerS3.AUTO_CONTENT_TYPE, // If you want multer to detect automatically
-    // Else The optional contentType option can be used to set Content/mime type of the file. By default the content type is set to application/octet-stream
+    contentType: multerS3.AUTO_CONTENT_TYPE,
   }),
 });
